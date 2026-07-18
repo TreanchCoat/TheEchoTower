@@ -205,7 +205,6 @@ function renderEcho(v, root) {
   const doorCell =
     '<div class="cell doorcell"><div class="poslabel">S — DOOR</div>' +
     '<button data-act="door" data-which="south">Step through the south door</button>' +
-    (v.mirrorUnlocked ? '<button data-act="door" data-which="silver" style="border-color:var(--silver);color:var(--silver)">Step through the SILVER door</button>' : '') +
     '</div>';
   root.innerHTML =
     '<div class="panel center"><h2>' + v.glyph + ' The ' + esc(v.room) + ' Room</h2><p class="dim">' + esc(v.desc) + '</p></div>' +
@@ -306,7 +305,7 @@ function renderLoom(v, root) {
       '</div>' +
       '<div class="panel dim">In the Loom: ' + v.loomPlayers.map(esc).join(', ') +
         (v.yellowAwake ? ' · <span style="color:var(--yellow)">the second shadow is awake</span>' : '') +
-        (v.mirrorUnlocked ? ' · <span style="color:var(--silver)">the silver doors stand open</span>' : '') + '</div>' +
+        (v.mirrorUnlocked ? ' · <span style="color:var(--silver)">the way to the mirror room is open</span>' : '') + '</div>' +
     '</div></div>';
   root.querySelectorAll('.statue').forEach(g => { g.onclick = () => api('aimBeam', { room: g.dataset.room }); });
   root.querySelectorAll('select[data-statue]').forEach(sel => {

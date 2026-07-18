@@ -173,8 +173,8 @@ function checkGoals() {
   const m = holdsMap();
   if (state.yellowAwake && !state.mirrorUnlocked && room !== 'Mirror' && m.N && m.E && m.W) {
     state.mirrorUnlocked = true;
-    log('★ GOAL 2 — the Mirror Room is unlocked. Silver doors appear.');
-    toast('all', 'Stone grinds throughout the tower. A silver door appears in the south-east corner of every room. In the Loom, the mirror statue opens its eyes and three new candles rise from the table.');
+    log('★ GOAL 2 — the Mirror Room is unlocked.');
+    toast('all', 'Stone grinds throughout the tower. In the Loom, the mirror statue opens its eyes and three new candles rise from the table. The way to the Mirror Room is now open.');
   }
   if (!state.solved && state.mirrorUnlocked && room === 'Mirror' && m.N && m.NW && m.NE) {
     state.solved = true;
@@ -191,20 +191,22 @@ function walkerGesture(pos, kind) {
   if (state.solved) return { error: 'The puzzle is already solved.' };
   const room = state.walker.room; const st = stationAt(room, pos);
   if (state.walker.hold && state.walker.hold !== pos) state.walker.hold = null; // moving away releases
-  state.scripts.current.push(pos);
   let msg;
   if (kind === 'hold') {
     if (!st) return { error: 'There is nothing to hold there.' };
     if (st.grated) return { error: 'Your hand stops dead at the cold iron.' };
     state.walker.hold = pos;
     msg = 'You take hold of the ' + st.name + ' and keep it engaged.';
+    state.scripts.current.push(pos);
   } else if (!st) {
     msg = 'You grasp at bare stone and empty air. The gesture is made — and, somewhere, remembered.';
+    state.scripts.current.push(pos);
   } else if (st.grated) {
-    msg = 'You reach for the ' + st.name + ', but your hand stops dead against the pale iron grate. The gesture is remembered.';
+    msg = 'You reach for the ' + st.name + ', but your hand stops dead against the pale iron grate. The gesture is not remembered.';
   } else {
     msg = 'You work the ' + st.name + ' for a moment, then let go.';
     flicker([{ idx: candleIndex(room, pos), color: 'orange' }]);
+    state.scripts.current.push(pos);
   }
   log('Walker gesture: ' + pos + ' (' + kind + ') in ' + room + '.');
   checkGoals();
