@@ -297,7 +297,6 @@ function renderLoom(v, root) {
         '</div>' +
         '<div class="center" style="margin-top:8px"><button id="snuffBtn" ' + (v.rewindAvailable ? '' : 'disabled') + '>' +
           (snuffMode ? 'Cancel — click a candle to snuff && relight it' : 'Snuff && relight a candle (once per visit)') + '</button></div>' +
-        '<p class="dim center">Flames: <span style="color:var(--orange)">orange = the living</span> · <span style="color:var(--blue)">blue = the first shadow</span> · <span style="color:var(--yellow)">yellow = the second shadow</span></p>' +
       '</div>' +
       '<div class="panel"><h3>The mural — only one arc is lit</h3>' +
         '<div class="mural"><b>' + esc(v.mural.title) + '</b><br>' + v.mural.lines.map(esc).join('<br>') + '</div>' +

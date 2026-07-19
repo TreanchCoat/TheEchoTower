@@ -304,8 +304,11 @@ function snuffCandle(idx) {
   if (c && c.room === state.walker.room && (holdsMap()[c.pos] || []).includes('walker')) {
     state.ringOffset = (state.ringOffset + 23) % 24;
     state.clockNotches = Math.max(0, state.clockNotches - 1);
-    msg = 'You snuff and relight the candle. The great ring grinds backward one notch.';
-    log('Rewind succeeded: clock now ' + state.clockNotches + '/24.');
+    state.scripts.current = [];
+    state.scripts.blue = [];
+    state.scripts.yellow = [];
+    msg = 'You snuff and relight the candle. The great ring grinds backward one notch. All shadows disappear and the Walker\'s actions are forgotten.';
+    log('Rewind succeeded: clock now ' + state.clockNotches + '/24. Mimes and scripts wiped.');
   } else {
     msg = 'You snuff and relight the candle. Nothing happens.';
     log('Rewind attempted on the wrong candle. Chance spent for this visit.');
