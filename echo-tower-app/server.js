@@ -261,6 +261,7 @@ function doorPass(dest, via) {
     toast('all', 'Every candle gutters at once. The shadows scatter like smoke — all scripts are wiped. The ring begins its turn anew.');
   }
   checkGoals();
+  playSound('gear', false);
   broadcast();
   return { ok: true, message: 'You step through the ' + via + ' door.' + (from === dest ? ' The door opens back into the same room.' : ''), narration: narr };
 }
@@ -308,6 +309,7 @@ function snuffCandle(idx) {
     state.scripts.blue = [];
     state.scripts.yellow = [];
     msg = 'You snuff and relight the candle. The great ring grinds backward one notch. All shadows disappear and the Walker\'s actions are forgotten.';
+    playSound('gear', true);
     log('Rewind succeeded: clock now ' + state.clockNotches + '/24. Mimes and scripts wiped.');
   } else {
     msg = 'You snuff and relight the candle. Nothing happens.';
@@ -426,6 +428,11 @@ function flicker(items) {
     }
   }
 }
+function playSound(sound, reverse = false) {
+  for (const c of clients) {
+    try { sseSend(c.res, { type: 'sound', sound, reverse }); } catch (e) { /* ignore */ }
+  }
+}
 setInterval(() => { for (const c of clients) { try { c.res.write(': ping\n\n'); } catch (e) { /* ignore */ } } }, 25000);
 
 // ---------------------------------------------------------------- actions
@@ -504,6 +511,14 @@ const server = http.createServer((req, res) => {
     fs.readFile(INDEX, (err, data) => {
       if (err) { res.writeHead(500); res.end('index.html missing'); return; }
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.end(data);
+    });
+    return;
+  }
+  if (req.method === 'GET' && url.pathname === '/gear.mp3') {
+    fs.readFile(path.join(__dirname, 'heavy_gear_locking_into_place.mp3'), (err, data) => {
+      if (err) { res.writeHead(404); res.end(); return; }
+      res.writeHead(200, { 'Content-Type': 'audio/mpeg', 'Cache-Control': 'public, max-age=31536000' });
       res.end(data);
     });
     return;

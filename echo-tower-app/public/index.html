@@ -75,6 +75,38 @@ let VIEW = null;
 let es = null;
 let snuffMode = false;
 
+let audioCtx = null;
+let gearBuffer = null;
+let gearReversedBuffer = null;
+
+async function initAudio() {
+  if (audioCtx) return;
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContext) return;
+  audioCtx = new AudioContext();
+  try {
+    const response = await fetch('/gear.mp3');
+    const arrayBuffer = await response.arrayBuffer();
+    gearBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+    gearReversedBuffer = audioCtx.createBuffer(gearBuffer.numberOfChannels, gearBuffer.length, gearBuffer.sampleRate);
+    for (let i = 0; i < gearBuffer.numberOfChannels; i++) {
+      const channelData = gearBuffer.getChannelData(i);
+      const reversedData = gearReversedBuffer.getChannelData(i);
+      for (let j = 0; j < gearBuffer.length; j++) reversedData[j] = channelData[gearBuffer.length - 1 - j];
+    }
+  } catch (e) { console.warn("Audio load failed", e); }
+}
+document.addEventListener('click', initAudio, { once: true });
+
+function playGearSound(reverse = false) {
+  if (!audioCtx || !gearBuffer || !gearReversedBuffer) return;
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  const source = audioCtx.createBufferSource();
+  source.buffer = reverse ? gearReversedBuffer : gearBuffer;
+  source.connect(audioCtx.destination);
+  source.start();
+}
+
 async function api(action, data) {
   const r = await fetch('/api', { method:'POST', headers:{'Content-Type':'application/json'},
     body: JSON.stringify(Object.assign({ action, name: NAME }, data || {})) });
@@ -98,6 +130,7 @@ function connect() {
     if (m.type === 'state') { VIEW = m.view; render(); }
     else if (m.type === 'toast') showToast(m.msg, 10000);
     else if (m.type === 'flicker') doFlickers(m.items);
+    else if (m.type === 'sound' && m.sound === 'gear') playGearSound(m.reverse);
   };
 }
 
